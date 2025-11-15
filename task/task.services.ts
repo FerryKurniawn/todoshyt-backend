@@ -1,11 +1,21 @@
 import { prisma } from "../prisma/client.ts";
 
-export const createTaskService = async (
+export const createUserTaskService = async (
+  userId: string,
   taskName: string,
   description: string
 ) => {
+  if (!userId) {
+    throw new Error("user id is required");
+  }
+
+  const userExist = await prisma.user.findUnique({ where: { id: userId } });
+
+  if (!userExist) {
+    throw new Error("User does not exist");
+  }
   const task = await prisma.task.create({
-    data: { taskName, description },
+    data: { userId, taskName, description },
   });
 
   return task;
@@ -16,9 +26,14 @@ export const getTasksService = async () => {
   return task;
 };
 
-export const getTaskByIdService = async (id: number) => {
+export const getUserTasksService = async (userId: string) => {
+  const task = await prisma.task.findMany({ where: { userId } });
+  return task;
+};
+
+export const getTaskByIdService = async (userId: string, id: number) => {
   const task = await prisma.task.findUnique({
-    where: { id },
+    where: { userId, id },
   });
   if (!task) {
     throw new Error("Task not found");
@@ -28,9 +43,14 @@ export const getTaskByIdService = async (id: number) => {
 
 export const putTaskService = async (
   id: number,
+  userId: string,
   taskName: string,
   description: string
 ) => {
+  const userExist = await prisma.user.findUnique({ where: { id: userId } });
+  if (!userExist) {
+    throw new Error("User does not exist");
+  }
   const task = await prisma.task.findUnique({
     where: { id },
   });
@@ -48,9 +68,16 @@ export const putTaskService = async (
 
 export const patchTaskService = async (
   id: number,
+  userId: string,
   taskName?: string,
   description?: string
 ) => {
+  const userExist = await prisma.user.findUnique({ where: { id: userId } });
+
+  if (!userExist) {
+    throw new Error("User does not exist");
+  }
+
   const task = await prisma.task.findUnique({
     where: { id },
   });
