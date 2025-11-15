@@ -7,6 +7,7 @@ import {
   putTaskService,
   patchTaskService,
   getUserTasksService,
+  deleteTaskService,
 } from "../task/task.services.ts";
 import { z } from "zod";
 
@@ -111,5 +112,25 @@ export const patchTask = async (req: Request, res: Response) => {
     }
     console.error("Error patch task:", error);
     return res.status(500).json({ error: error });
+  }
+};
+
+export const deleteUserIdTask = async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const userId = req.params.userId;
+  try {
+    const deletedUser = await deleteTaskService(id, userId);
+    return res.json({ data: deletedUser, message: "Delete success" });
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message === "User does not exist") {
+        return res.status(400).json({ error: error.message });
+      }
+      if (error.message === "Task does not exist") {
+        return res.status(400).json({ error: error.message });
+      }
+    }
+    console.error(error);
+    return res.status(500).json({ error });
   }
 };

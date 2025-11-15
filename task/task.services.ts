@@ -36,7 +36,7 @@ export const getTaskByIdService = async (userId: string, id: number) => {
     where: { userId, id },
   });
   if (!task) {
-    throw new Error("Task not found");
+    throw new Error("Task does not exist");
   }
   return task;
 };
@@ -55,7 +55,7 @@ export const putTaskService = async (
     where: { id },
   });
   if (!task) {
-    throw new Error("Task not found");
+    throw new Error("Task does not exist");
   }
 
   const updateTask = await prisma.task.update({
@@ -83,7 +83,7 @@ export const patchTaskService = async (
   });
 
   if (!task) {
-    throw new Error("Task not found");
+    throw new Error("Task does not exist");
   }
 
   const data: any = {};
@@ -101,4 +101,19 @@ export const patchTaskService = async (
   });
 
   return updatedTask;
+};
+
+export const deleteTaskService = async (id: number, userId: string) => {
+  const userExist = await prisma.user.findUnique({ where: { id: userId } });
+  if (!userExist) {
+    throw new Error("User does not exist ");
+  }
+  const taskExist = await prisma.task.findUnique({ where: { id } });
+  if (!taskExist) {
+    throw new Error("Task does not exist ");
+  }
+
+  const deleteTask = await prisma.task.delete({ where: { id } });
+
+  return deleteTask;
 };
