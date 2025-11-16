@@ -12,6 +12,7 @@ import { z } from "zod";
 const taskSchema = z.object({
   taskName: z.string().min(1, "task name field are required"),
   description: z.string(),
+  isDone: z.boolean().optional(),
 });
 
 export const create = async (req: Request, res: Response) => {
@@ -63,13 +64,13 @@ export const patchTask = async (req: Request, res: Response) => {
     if (!parsed.success) {
       return res.status(400).json({ error: parsed.error.issues });
     }
-    const { taskName, description } = parsed.data;
+    const { taskName, description, isDone } = parsed.data;
 
     const updatedTask = await patchTaskService(
       id,
-
       taskName,
-      description
+      description,
+      isDone
     );
 
     return res.json(updatedTask);

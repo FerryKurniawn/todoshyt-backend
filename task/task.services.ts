@@ -29,7 +29,8 @@ export const getTaskByIdService = async (id: number) => {
 export const patchTaskService = async (
   id: number,
   taskName?: string,
-  description?: string
+  description?: string,
+  isDone?: boolean
 ) => {
   const task = await prisma.task.findUnique({
     where: { id },
@@ -41,11 +42,14 @@ export const patchTaskService = async (
 
   const data: any = {};
 
-  if (taskName) {
+  if (taskName !== undefined) {
     data.taskName = taskName;
   }
-  if (description) {
+  if (description !== undefined) {
     data.description = description;
+  }
+  if (isDone !== undefined) {
+    data.isDone = isDone;
   }
 
   const updatedTask = await prisma.task.update({
