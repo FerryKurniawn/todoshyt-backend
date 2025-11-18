@@ -35,11 +35,26 @@ export const create = async (req: Request, res: Response) => {
 
 export const getAllTask = async (req: Request, res: Response) => {
   try {
-    const getTask = await getTasksService();
-    return res.json({ task: getTask });
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({
+        error: "Page dan limit harus angka positif",
+      });
+    }
+
+    const getTask = await getTasksService(page, limit);
+
+    return res.json({
+      page,
+      limit,
+      totalTasks: getTask.totalTasks,
+      tasks: getTask.tasks,
+    });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: error });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -70,7 +85,7 @@ export const patchTask = async (req: Request, res: Response) => {
       id,
       taskName,
       description,
-      isDone
+      isDone,
     );
 
     return res.json(updatedTask);

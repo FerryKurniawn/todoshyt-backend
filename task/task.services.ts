@@ -2,7 +2,7 @@ import { prisma } from "../prisma/client.ts";
 
 export const createTaskService = async (
   taskName: string,
-  description: string
+  description: string,
 ) => {
   const task = await prisma.task.create({
     data: { taskName, description },
@@ -11,9 +11,19 @@ export const createTaskService = async (
   return task;
 };
 
-export const getTasksService = async () => {
-  const task = await prisma.task.findMany();
-  return task;
+export const getTasksService = async (page: number, limit: number) => {
+  const skip = (page - 1) * limit;
+  const tasks = await prisma.task.findMany({
+    skip,
+    take: limit,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const totalTasks = await prisma.task.count();
+
+  return { tasks, totalTasks };
 };
 
 export const getTaskByIdService = async (id: number) => {
@@ -30,7 +40,7 @@ export const patchTaskService = async (
   id: number,
   taskName?: string,
   description?: string,
-  isDone?: boolean
+  isDone?: boolean,
 ) => {
   const task = await prisma.task.findUnique({
     where: { id },
