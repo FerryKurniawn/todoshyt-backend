@@ -1,8 +1,8 @@
-import { prisma } from "../prisma/client.ts";
+import { prisma } from "../prisma/client.js";
 
 export const createTaskService = async (
   taskName: string,
-  description: string,
+  description: string
 ) => {
   const task = await prisma.task.create({
     data: { taskName, description },
@@ -40,7 +40,7 @@ export const patchTaskService = async (
   id: number,
   taskName?: string,
   description?: string,
-  isDone?: boolean,
+  isDone?: boolean
 ) => {
   const task = await prisma.task.findUnique({
     where: { id },

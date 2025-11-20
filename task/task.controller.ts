@@ -6,7 +6,7 @@ import {
   getTaskByIdService,
   patchTaskService,
   deleteTaskService,
-} from "../task/task.services.ts";
+} from "../task/task.services.js";
 import { z } from "zod";
 
 const taskSchema = z.object({
@@ -85,7 +85,7 @@ export const patchTask = async (req: Request, res: Response) => {
       id,
       taskName,
       description,
-      isDone,
+      isDone
     );
 
     return res.json(updatedTask);
